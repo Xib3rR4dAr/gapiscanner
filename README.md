@@ -18,6 +18,7 @@ pipx install git+https://github.com/ozguralp/gmapsapiscanner
 gmapsapiscanner --api-key KEY
 gmapsapiscanner --api-key KEY --no-jsapi   # Skip interactive JavaScript API test (e.g. for CI)
 gmapsapiscanner --no-jsapi                 # Prompt for API key, then run without JS API prompt
+gmapsapiscanner --vuln                     # Show only vulnerable API results, skip non-vulnerable results
 ```
 
 ***Checked APIs:***
