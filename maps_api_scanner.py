@@ -43,7 +43,7 @@ def _error_message(response, keys=("error_message", "errorMessage")):
     return "Unknown error (status %s)" % getattr(response, "status_code", "?")
 
 
-def scan_gmaps(apikey, skip_jsapi=False, proxy=None):
+def scan_gmaps(apikey, skip_jsapi=False, proxy=None, vuln_only=False):
 	_configure_proxy(proxy)
 	vulnerable_apis = []
 	url = "https://maps.googleapis.com/maps/api/staticmap?center=45%2C10&zoom=7&size=400x400&key="+apikey 
@@ -53,11 +53,13 @@ def scan_gmaps(apikey, skip_jsapi=False, proxy=None):
 		print(url)
 		vulnerable_apis.append("Staticmap 			|| $2 per 1000 requests")
 	elif b"PNG" in response.content:
-		print("API key is not vulnerable for Staticmap API.")
-		print("Reason: Manually check the "+url+" to view the reason.")
+		if not vuln_only:
+			print("API key is not vulnerable for Staticmap API.")
+			print("Reason: Manually check the "+url+" to view the reason.")
 	else:
-		print("API key is not vulnerable for Staticmap API.")
-		print("Reason: "+ str(response.content))
+		if not vuln_only:
+			print("API key is not vulnerable for Staticmap API.")
+			print("Reason: "+ str(response.content))
 
 	url = "https://maps.googleapis.com/maps/api/streetview?size=400x400&location=40.720032,-73.988354&fov=90&heading=235&pitch=10&key="+apikey 
 	response = requests.get(url, **_REQUEST_KWARGS)
@@ -66,11 +68,13 @@ def scan_gmaps(apikey, skip_jsapi=False, proxy=None):
 		print(url)
 		vulnerable_apis.append("Streetview 			|| $7 per 1000 requests")
 	elif b"PNG" in response.content:
-		print("API key is not vulnerable for Streetview API.")
-		print("Reason: Manually check the "+url+" to view the reason.")
+		if not vuln_only:
+			print("API key is not vulnerable for Streetview API.")
+			print("Reason: Manually check the "+url+" to view the reason.")
 	else:
-		print("API key is not vulnerable for Streetview API.")
-		print("Reason: "+ str(response.content))
+		if not vuln_only:
+			print("API key is not vulnerable for Streetview API.")
+			print("Reason: "+ str(response.content))
 
 	url = "https://maps.googleapis.com/maps/api/directions/json?origin=Disneyland&destination=Universal+Studios+Hollywood4&key="+apikey
 	response = requests.get(url, **_REQUEST_KWARGS)
@@ -80,8 +84,9 @@ def scan_gmaps(apikey, skip_jsapi=False, proxy=None):
 		vulnerable_apis.append("Directions 			|| $5 per 1000 requests")
 		vulnerable_apis.append("Directions (Advanced) 	|| $10 per 1000 requests")
 	else:
-		print("API key is not vulnerable for Directions API.")
-		print("Reason: "+ _error_message(response))
+		if not vuln_only:
+			print("API key is not vulnerable for Directions API.")
+			print("Reason: "+ _error_message(response))
 
 	url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=40,30&key="+apikey 
 	response = requests.get(url, **_REQUEST_KWARGS)
@@ -90,8 +95,9 @@ def scan_gmaps(apikey, skip_jsapi=False, proxy=None):
 		print(url)
 		vulnerable_apis.append("Geocode 			|| $5 per 1000 requests")
 	else:
-		print("API key is not vulnerable for Geocode API.")
-		print("Reason: "+ _error_message(response))
+		if not vuln_only:
+			print("API key is not vulnerable for Geocode API.")
+			print("Reason: "+ _error_message(response))
 
 	url = "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=40.6655101,-73.89188969999998&destinations=40.6905615%2C-73.9976592%7C40.6905615%2C-73.9976592%7C40.6905615%2C-73.9976592%7C40.6905615%2C-73.9976592%7C40.6905615%2C-73.9976592%7C40.6905615%2C-73.9976592%7C40.659569%2C-73.933783%7C40.729029%2C-73.851524%7C40.6860072%2C-73.6334271%7C40.598566%2C-73.7527626%7C40.659569%2C-73.933783%7C40.729029%2C-73.851524%7C40.6860072%2C-73.6334271%7C40.598566%2C-73.7527626&key="+apikey 
 	response = requests.get(url, **_REQUEST_KWARGS)
@@ -101,8 +107,9 @@ def scan_gmaps(apikey, skip_jsapi=False, proxy=None):
 		vulnerable_apis.append("Distance Matrix 		|| $5 per 1000 elements")
 		vulnerable_apis.append("Distance Matrix (Advanced) 	|| $10 per 1000 elements")
 	else:
-		print("API key is not vulnerable for Distance Matrix API.")
-		print("Reason: "+ _error_message(response))
+		if not vuln_only:
+			print("API key is not vulnerable for Distance Matrix API.")
+			print("Reason: "+ _error_message(response))
 
 	url = "https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=Museum%20of%20Contemporary%20Art%20Australia&inputtype=textquery&fields=photos,formatted_address,name,rating,opening_hours,geometry&key="+apikey
 	response = requests.get(url, **_REQUEST_KWARGS)
@@ -111,8 +118,9 @@ def scan_gmaps(apikey, skip_jsapi=False, proxy=None):
 		print(url)
 		vulnerable_apis.append("Find Place From Text 		|| $17 per 1000 elements")
 	else:
-		print("API key is not vulnerable for Find Place From Text API.")
-		print("Reason: "+ _error_message(response))
+		if not vuln_only:
+			print("API key is not vulnerable for Find Place From Text API.")
+			print("Reason: "+ _error_message(response))
 
 	url = "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=Bingh&types=%28cities%29&key="+apikey 
 	response = requests.get(url, **_REQUEST_KWARGS)
@@ -122,8 +130,9 @@ def scan_gmaps(apikey, skip_jsapi=False, proxy=None):
 		vulnerable_apis.append("Autocomplete 			|| $2.83 per 1000 requests")
 		vulnerable_apis.append("Autocomplete Per Session 	|| $17 per 1000 requests")
 	else:
-		print("API key is not vulnerable for Autocomplete API.")
-		print("Reason: "+ _error_message(response))
+		if not vuln_only:
+			print("API key is not vulnerable for Autocomplete API.")
+			print("Reason: "+ _error_message(response))
 
 	url = "https://maps.googleapis.com/maps/api/elevation/json?locations=39.7391536,-104.9847034&key="+apikey 
 	response = requests.get(url, **_REQUEST_KWARGS)
@@ -132,8 +141,9 @@ def scan_gmaps(apikey, skip_jsapi=False, proxy=None):
 		print(url)
 		vulnerable_apis.append("Elevation 			|| $5 per 1000 requests")
 	else:
-		print("API key is not vulnerable for Elevation API.")
-		print("Reason: "+ _error_message(response))
+		if not vuln_only:
+			print("API key is not vulnerable for Elevation API.")
+			print("Reason: "+ _error_message(response))
 
 	url = "https://maps.googleapis.com/maps/api/timezone/json?location=39.6034810,-119.6822510&timestamp=1331161200&key="+apikey 
 	response = requests.get(url, **_REQUEST_KWARGS)
@@ -142,8 +152,9 @@ def scan_gmaps(apikey, skip_jsapi=False, proxy=None):
 		print(url)
 		vulnerable_apis.append("Timezone 			|| $5 per 1000 requests")
 	else:
-		print("API key is not vulnerable for Timezone API.")
-		print("Reason: "+ _error_message(response, ("errorMessage", "error_message")))
+		if not vuln_only:
+			print("API key is not vulnerable for Timezone API.")
+			print("Reason: "+ _error_message(response, ("errorMessage", "error_message")))
 
 	url = "https://roads.googleapis.com/v1/nearestRoads?points=60.170880,24.942795|60.170879,24.942796|60.170877,24.942796&key="+apikey 
 	response = requests.get(url, **_REQUEST_KWARGS)
@@ -152,8 +163,9 @@ def scan_gmaps(apikey, skip_jsapi=False, proxy=None):
 		print(url)
 		vulnerable_apis.append("Nearest Roads 		|| $10 per 1000 requests")
 	else:
-		print("API key is not vulnerable for Nearest Roads API.")
-		print("Reason: "+ _error_message(response, ("error",)))
+		if not vuln_only:
+			print("API key is not vulnerable for Nearest Roads API.")
+			print("Reason: "+ _error_message(response, ("error",)))
 
 	url = "https://www.googleapis.com/geolocation/v1/geolocate?key="+apikey 
 	postdata = {'considerIp': 'true'}
@@ -163,8 +175,9 @@ def scan_gmaps(apikey, skip_jsapi=False, proxy=None):
 		print("curl -i -s -k  -X $'POST' -H $'Host: www.googleapis.com' -H $'Content-Length: 22' --data-binary $'{\"considerIp\": \"true\"}' $'"+url+"'")
 		vulnerable_apis.append("Geolocation 			|| $5 per 1000 requests")
 	else:
-		print("API key is not vulnerable for Geolocation API.")
-		print("Reason: "+ _error_message(response, ("error",)))
+		if not vuln_only:
+			print("API key is not vulnerable for Geolocation API.")
+			print("Reason: "+ _error_message(response, ("error",)))
 
 	url = "https://roads.googleapis.com/v1/snapToRoads?path=-35.27801,149.12958|-35.28032,149.12907&interpolate=true&key="+apikey 
 	response = requests.get(url, **_REQUEST_KWARGS)
@@ -173,8 +186,9 @@ def scan_gmaps(apikey, skip_jsapi=False, proxy=None):
 		print(url)
 		vulnerable_apis.append("Route to Traveled 		|| $10 per 1000 requests")
 	else:
-		print("API key is not vulnerable for Route to Traveled API.")
-		print("Reason: "+ _error_message(response, ("error",)))
+		if not vuln_only:
+			print("API key is not vulnerable for Route to Traveled API.")
+			print("Reason: "+ _error_message(response, ("error",)))
 
 	url = "https://roads.googleapis.com/v1/speedLimits?path=38.75807927603043,-9.03741754643809&key="+apikey 
 	response = requests.get(url, **_REQUEST_KWARGS)
@@ -183,8 +197,9 @@ def scan_gmaps(apikey, skip_jsapi=False, proxy=None):
 		print(url)
 		vulnerable_apis.append("Speed Limit-Roads 		|| $20 per 1000 requests")
 	else:
-		print("API key is not vulnerable for Speed Limit-Roads API.")
-		print("Reason: "+ _error_message(response, ("error",)))
+		if not vuln_only:
+			print("API key is not vulnerable for Speed Limit-Roads API.")
+			print("Reason: "+ _error_message(response, ("error",)))
 
 	url = "https://maps.googleapis.com/maps/api/place/details/json?place_id=ChIJN1t_tDeuEmsRUsoyG83frY4&fields=name,rating,formatted_phone_number&key="+apikey 
 	response = requests.get(url, **_REQUEST_KWARGS)
@@ -193,8 +208,9 @@ def scan_gmaps(apikey, skip_jsapi=False, proxy=None):
 		print(url)
 		vulnerable_apis.append("Place Details 		|| $17 per 1000 requests")
 	else:
-		print("API key is not vulnerable for Place Details API.")
-		print("Reason: "+ _error_message(response))
+		if not vuln_only:
+			print("API key is not vulnerable for Place Details API.")
+			print("Reason: "+ _error_message(response))
 
 	url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=-33.8670522,151.1957362&radius=100&types=food&name=harbour&key="+apikey 
 	response = requests.get(url, **_REQUEST_KWARGS)
@@ -203,8 +219,9 @@ def scan_gmaps(apikey, skip_jsapi=False, proxy=None):
 		print(url)
 		vulnerable_apis.append("Nearby Search-Places		|| $32 per 1000 requests")
 	else:
-		print("API key is not vulnerable for Nearby Search-Places API.")
-		print("Reason: "+ _error_message(response))
+		if not vuln_only:
+			print("API key is not vulnerable for Nearby Search-Places API.")
+			print("Reason: "+ _error_message(response))
 
 	url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=restaurants+in+Sydney&key="+apikey 
 	response = requests.get(url, **_REQUEST_KWARGS)
@@ -213,8 +230,9 @@ def scan_gmaps(apikey, skip_jsapi=False, proxy=None):
 		print(url)
 		vulnerable_apis.append("Text Search-Places 		|| $32 per 1000 requests")
 	else:
-		print("API key is not vulnerable for Text Search-Places API.")
-		print("Reason: "+ _error_message(response))
+		if not vuln_only:
+			print("API key is not vulnerable for Text Search-Places API.")
+			print("Reason: "+ _error_message(response))
 
 	url = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=CnRtAAAATLZNl354RwP_9UKbQ_5Psy40texXePv4oAlgP4qNEkdIrkyse7rPXYGd9D_Uj1rVsQdWT4oRz4QrYAJNpFX7rzqqMlZw2h2E2y5IKMUZ7ouD_SlcHxYq1yL4KbKUv3qtWgTK0A6QbGh87GB3sscrHRIQiG2RrmU_jF4tENr9wGS_YxoUSSDrYjWmrNfeEHSGSc3FyhNLlBU&key="+apikey 
 	response = requests.get(url, **{**_REQUEST_KWARGS, "allow_redirects": False})
@@ -223,8 +241,9 @@ def scan_gmaps(apikey, skip_jsapi=False, proxy=None):
 		print(url)
 		vulnerable_apis.append("Places Photo 			|| $7 per 1000 requests")
 	else:
-		print("API key is not vulnerable for Places Photo API.")
-		print("Reason: Verbose responses are not enabled for this API, cannot determine the reason.")
+		if not vuln_only:
+			print("API key is not vulnerable for Places Photo API.")
+			print("Reason: Verbose responses are not enabled for this API, cannot determine the reason.")
 
 	# Address Validation API (POST)
 	url = "https://addressvalidation.googleapis.com/v1:validateAddress?key=" + apikey
@@ -235,8 +254,9 @@ def scan_gmaps(apikey, skip_jsapi=False, proxy=None):
 		print('curl -X POST -H "Content-Type: application/json" -d \'{"address":{"regionCode":"US","addressLines":["1600 Amphitheatre Pkwy"]}}\' "' + url.replace("?key=" + apikey, "?key=YOUR_KEY") + '"')
 		vulnerable_apis.append("Address Validation 		|| $5 per 1000 requests")
 	else:
-		print("API key is not vulnerable for Address Validation API.")
-		print("Reason: " + _error_message(response, ("error",)))
+		if not vuln_only:
+			print("API key is not vulnerable for Address Validation API.")
+			print("Reason: " + _error_message(response, ("error",)))
 
 	# Air Quality API (POST)
 	url = "https://airquality.googleapis.com/v1/currentConditions:lookup?key=" + apikey
@@ -247,8 +267,9 @@ def scan_gmaps(apikey, skip_jsapi=False, proxy=None):
 		print('curl -X POST -H "Content-Type: application/json" -d \'{"location":{"latitude":37.42,"longitude":-122.08}}\' "' + url.replace("?key=" + apikey, "?key=YOUR_KEY") + '"')
 		vulnerable_apis.append("Air Quality 			|| Paid per request")
 	else:
-		print("API key is not vulnerable for Air Quality API.")
-		print("Reason: " + _error_message(response, ("error",)))
+		if not vuln_only:
+			print("API key is not vulnerable for Air Quality API.")
+			print("Reason: " + _error_message(response, ("error",)))
 
 	# Aerial View API (GET) - video metadata lookup
 	url = "https://aerialview.googleapis.com/v1/videos:lookupVideoMetadata?key=" + apikey + "&address=600%20Montgomery%20St%2C%20San%20Francisco%2C%20CA%2094111"
@@ -258,8 +279,9 @@ def scan_gmaps(apikey, skip_jsapi=False, proxy=None):
 		print(url)
 		vulnerable_apis.append("Aerial View 			|| Paid per request")
 	else:
-		print("API key is not vulnerable for Aerial View API.")
-		print("Reason: " + _error_message(response, ("error",)))
+		if not vuln_only:
+			print("API key is not vulnerable for Aerial View API.")
+			print("Reason: " + _error_message(response, ("error",)))
 
 	# Routes API - computeRoutes (POST, requires field mask)
 	url = "https://routes.googleapis.com/directions/v2:computeRoutes?key=" + apikey
@@ -275,8 +297,9 @@ def scan_gmaps(apikey, skip_jsapi=False, proxy=None):
 		print('curl -X POST -H "Content-Type: application/json" -H "X-Goog-FieldMask: routes.duration,routes.distanceMeters" -d \'{"origin":{"location":{"latLng":{"latitude":37.42,"longitude":-122.08}}},"destination":{"location":{"latLng":{"latitude":37.43,"longitude":-122.09}}},"travelMode":"DRIVE"}\' "' + url.replace("?key=" + apikey, "?key=YOUR_KEY") + '"')
 		vulnerable_apis.append("Routes (computeRoutes) 	|| Paid per request")
 	else:
-		print("API key is not vulnerable for Routes API (computeRoutes).")
-		print("Reason: " + _error_message(response, ("error",)))
+		if not vuln_only:
+			print("API key is not vulnerable for Routes API (computeRoutes).")
+			print("Reason: " + _error_message(response, ("error",)))
 
 	# Routes API - computeRouteMatrix (POST)
 	url = "https://routes.googleapis.com/distanceMatrix/v2:computeRouteMatrix?key=" + apikey
@@ -295,8 +318,9 @@ def scan_gmaps(apikey, skip_jsapi=False, proxy=None):
 		print('curl -X POST -H "Content-Type: application/json" -H "X-Goog-FieldMask: originIndex,destinationIndex,status,distanceMeters,duration" -d \'{"origins":[{"waypoint":{"location":{"latLng":{"latitude":37.42,"longitude":-122.08}}}}],"destinations":[{"waypoint":{"location":{"latLng":{"latitude":37.43,"longitude":-122.09}}}}],"travelMode":"DRIVE"}\' "' + url.replace("?key=" + apikey, "?key=YOUR_KEY") + '"')
 		vulnerable_apis.append("Routes (Route Matrix) 	|| Paid per element")
 	else:
-		print("API key is not vulnerable for Routes API (computeRouteMatrix).")
-		print("Reason: " + _error_message(response, ("error",)))
+		if not vuln_only:
+			print("API key is not vulnerable for Routes API (computeRouteMatrix).")
+			print("Reason: " + _error_message(response, ("error",)))
 
 	url = "https://fcm.googleapis.com/fcm/send" 
 	postdata = "{'registration_ids':['ABC']}"
@@ -306,20 +330,21 @@ def scan_gmaps(apikey, skip_jsapi=False, proxy=None):
 		print("curl --header \"Authorization: key="+apikey+"\" --header Content-Type:\"application/json\" https://fcm.googleapis.com/fcm/send -d '{\"registration_ids\":[\"ABC\"]}'")
 		vulnerable_apis.append("FCM Takeover 			|| https://abss.me/posts/fcm-takeover/")
 	else:
-		print("API key is not vulnerable for FCM API.")
-		reason_found = False
-		for line in response.iter_lines():
-			if line and b"TITLE" in line:
-				try:
-					msg = line.decode("utf-8", errors="replace").split("TITLE")[1].split("<")[0].replace(">", "").strip()
-					if msg:
-						print("Reason: " + msg)
-						reason_found = True
-						break
-				except (IndexError, AttributeError):
-					pass
-		if not reason_found:
-			print("Reason: " + _error_message(response, ("error",)) if response.content else ("HTTP %s" % response.status_code))
+		if not vuln_only:
+			print("API key is not vulnerable for FCM API.")
+			reason_found = False
+			for line in response.iter_lines():
+				if line and b"TITLE" in line:
+					try:
+						msg = line.decode("utf-8", errors="replace").split("TITLE")[1].split("<")[0].replace(">", "").strip()
+						if msg:
+							print("Reason: " + msg)
+							reason_found = True
+							break
+					except (IndexError, AttributeError):
+						pass
+			if not reason_found:
+				print("Reason: " + _error_message(response, ("error",)) if response.content else ("HTTP %s" % response.status_code))
 	
 		# Gemini Files API (GET)
 		url = "https://generativelanguage.googleapis.com/v1beta/files?key=" + apikey
@@ -330,8 +355,9 @@ def scan_gmaps(apikey, skip_jsapi=False, proxy=None):
 		    print(url)
 		    vulnerable_apis.append("Gemini (Files)           || Data Leak Risk https://trufflesecurity.com/blog/google-api-keys-werent-secrets-but-then-gemini-changed-the-rules")
 		else:
-		    print("API key is not vulnerable for Gemini Files API.")
-		    print("Reason: " + _error_message(response, ("error",)))
+		    if not vuln_only:
+		        print("API key is not vulnerable for Gemini Files API.")
+		        print("Reason: " + _error_message(response, ("error",)))
 
 		# Gemini Cached Contents API (GET)
 		url = "https://generativelanguage.googleapis.com/v1beta/cachedContents?key=" + apikey
@@ -342,8 +368,9 @@ def scan_gmaps(apikey, skip_jsapi=False, proxy=None):
 		    print(url)
 		    vulnerable_apis.append("Gemini (Cache)           || Data Leak Risk")
 		else:
-		    print("API key is not vulnerable for Gemini Cached Contents API.")
-		    print("Reason: " + _error_message(response, ("error",)))
+		    if not vuln_only:
+		        print("API key is not vulnerable for Gemini Cached Contents API.")
+		        print("Reason: " + _error_message(response, ("error",)))
 		    
 	print("-------------------------------------------------------------")
 	print("  Results 			|| Cost Table/Reference to Exploit:")
@@ -376,6 +403,10 @@ def main() -> None:
 	if skip_jsapi:
 		args = [a for a in args if a != "--no-jsapi"]
 
+	vuln_only = "--vuln" in args
+	if vuln_only:
+		args = [a for a in args if a != "--vuln"]
+
 	# Extract --proxy / -p value
 	proxy = None
 	for flag in ("--proxy", "-p"):
@@ -396,7 +427,7 @@ def main() -> None:
 	if len(args) > 0:
 		if args[0] == "--api-key" or args[0] == "-a":
 			if len(args) > 1:
-				scan_gmaps(args[1], skip_jsapi=skip_jsapi, proxy=proxy)
+				scan_gmaps(args[1], skip_jsapi=skip_jsapi, proxy=proxy, vuln_only=vuln_only)
 			else:
 				print("Missing api key, aborting.")
 				_print_usage()
@@ -407,15 +438,16 @@ def main() -> None:
 			_print_usage()
 	else:
 		apikey = input("Please enter the Google Maps API key you wanted to test: ")
-		scan_gmaps(apikey, skip_jsapi=skip_jsapi, proxy=proxy)
+		scan_gmaps(apikey, skip_jsapi=skip_jsapi, proxy=proxy, vuln_only=vuln_only)
 
 
 def _print_usage() -> None:
-	print("Usage: python maps_api_scanner.py [--api-key KEY] [--proxy URL] [--no-jsapi]")
-	print("       gmapsapiscanner [--api-key KEY] [--proxy URL] [--no-jsapi]")
+	print("Usage: python maps_api_scanner.py [--api-key KEY] [--proxy URL] [--no-jsapi] [--vuln]")
+	print("       gmapsapiscanner [--api-key KEY] [--proxy URL] [--no-jsapi] [--vuln]")
 	print("  --api-key, -a   API key to test (otherwise prompted for input)")
 	print("  --proxy, -p     HTTP/HTTPS/SOCKS proxy URL (e.g. http://127.0.0.1:8080)")
 	print("  --no-jsapi      Skip the interactive JavaScript API test (useful for CI/automation)")
+	print("  --vuln          Show only vulnerable API results, skip non-vulnerable lines")
 	print("  --help, -h      Show this message")
 
 if __name__ == "__main__":
